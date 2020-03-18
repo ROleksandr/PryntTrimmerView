@@ -53,6 +53,16 @@ public protocol TrimmerViewDelegate: class {
             rightMaskView.backgroundColor = maskColor
         }
     }
+    
+    /// The corner radius used to left and right
+    @IBInspectable public var cornerRadius: CGFloat = 8 {
+        didSet {
+            layer.cornerRadius = cornerRadius
+            trimView.layer.cornerRadius = cornerRadius
+            leftHandleView.layer.cornerRadius = cornerRadius
+            rightHandleView.layer.cornerRadius = cornerRadius
+        }
+    }
 
     // MARK: Interface
 
@@ -77,7 +87,7 @@ public protocol TrimmerViewDelegate: class {
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
 
-    private let handleWidth: CGFloat = 15
+    private let handleWidth: CGFloat = 16
 
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
     public var minDuration: Double = 3
@@ -86,7 +96,7 @@ public protocol TrimmerViewDelegate: class {
 
     override func setupSubviews() {
         super.setupSubviews()
-        layer.cornerRadius = 2
+        layer.cornerRadius = cornerRadius
         layer.masksToBounds = true
         backgroundColor = UIColor.clear
         layer.zPosition = 1
@@ -107,8 +117,8 @@ public protocol TrimmerViewDelegate: class {
     }
 
     private func setupTrimmerView() {
-        trimView.layer.borderWidth = 2.0
-        trimView.layer.cornerRadius = 2.0
+        trimView.layer.borderWidth = 2
+        trimView.layer.cornerRadius = cornerRadius
         trimView.translatesAutoresizingMaskIntoConstraints = false
         trimView.isUserInteractionEnabled = false
         addSubview(trimView)
@@ -124,7 +134,8 @@ public protocol TrimmerViewDelegate: class {
     private func setupHandleView() {
 
         leftHandleView.isUserInteractionEnabled = true
-        leftHandleView.layer.cornerRadius = 2.0
+        leftHandleView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
+        leftHandleView.layer.cornerRadius = cornerRadius
         leftHandleView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(leftHandleView)
 
@@ -140,9 +151,12 @@ public protocol TrimmerViewDelegate: class {
         leftHandleKnob.widthAnchor.constraint(equalToConstant: 2).isActive = true
         leftHandleKnob.centerYAnchor.constraint(equalTo: leftHandleView.centerYAnchor).isActive = true
         leftHandleKnob.centerXAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
+        leftHandleKnob.layer.cornerRadius = frame.height / 4.0
+        leftHandleKnob.layer.masksToBounds = true
 
         rightHandleView.isUserInteractionEnabled = true
-        rightHandleView.layer.cornerRadius = 2.0
+        rightHandleView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+        rightHandleView.layer.cornerRadius = cornerRadius
         rightHandleView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(rightHandleView)
 
@@ -158,6 +172,8 @@ public protocol TrimmerViewDelegate: class {
         rightHandleKnob.widthAnchor.constraint(equalToConstant: 2).isActive = true
         rightHandleKnob.centerYAnchor.constraint(equalTo: rightHandleView.centerYAnchor).isActive = true
         rightHandleKnob.centerXAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
+        rightHandleKnob.layer.cornerRadius = frame.height / 4.0
+        rightHandleKnob.layer.masksToBounds = true
     }
 
     private func setupMaskView() {
