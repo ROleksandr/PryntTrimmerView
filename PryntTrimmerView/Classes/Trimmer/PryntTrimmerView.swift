@@ -93,6 +93,12 @@ public protocol TrimmerViewDelegate: class {
     public var minDuration: Double = 3
 
     // MARK: - View & constraints configurations
+    
+    public override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        leftHandleKnob.layer.cornerRadius = frame.height / 4.0
+        rightHandleKnob.layer.cornerRadius = frame.height / 4.0
+    }
 
     override func setupSubviews() {
         super.setupSubviews()
@@ -151,7 +157,6 @@ public protocol TrimmerViewDelegate: class {
         leftHandleKnob.widthAnchor.constraint(equalToConstant: 2).isActive = true
         leftHandleKnob.centerYAnchor.constraint(equalTo: leftHandleView.centerYAnchor).isActive = true
         leftHandleKnob.centerXAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
-        leftHandleKnob.layer.cornerRadius = frame.height / 4.0
         leftHandleKnob.layer.masksToBounds = true
 
         rightHandleView.isUserInteractionEnabled = true
@@ -172,7 +177,6 @@ public protocol TrimmerViewDelegate: class {
         rightHandleKnob.widthAnchor.constraint(equalToConstant: 2).isActive = true
         rightHandleKnob.centerYAnchor.constraint(equalTo: rightHandleView.centerYAnchor).isActive = true
         rightHandleKnob.centerXAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
-        rightHandleKnob.layer.cornerRadius = frame.height / 4.0
         rightHandleKnob.layer.masksToBounds = true
     }
 
