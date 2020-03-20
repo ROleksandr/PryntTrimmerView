@@ -322,6 +322,7 @@ public protocol TrimmerViewDelegate: class {
             currentLeftConstraint = leftPosition
             updateLeftConstraint(with: .zero)
             layoutIfNeeded()
+            setNeedsDisplay()
         }
     }
 
@@ -336,6 +337,7 @@ public protocol TrimmerViewDelegate: class {
             currentRightConstraint = 0.0
             updateRightConstraint(with: CGPoint(x: -rightPosition, y: 0.0))
             layoutIfNeeded()
+            setNeedsDisplay()
         }
     }
 
