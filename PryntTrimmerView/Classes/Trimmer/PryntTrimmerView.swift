@@ -320,7 +320,7 @@ public protocol TrimmerViewDelegate: class {
         set {
             let leftPosition = getPosition(from: newValue ?? CMTime.zero) ?? 0.0
             currentLeftConstraint = leftPosition
-            leftConstraint?.constant = leftPosition
+            updateLeftConstraint(with: .zero)
             layoutIfNeeded()
         }
     }
@@ -334,7 +334,7 @@ public protocol TrimmerViewDelegate: class {
         set {
             let rightPosition = getPosition(from: newValue ?? asset?.duration ?? .zero) ?? 0.0
             currentRightConstraint = rightPosition
-            rightConstraint?.constant = rightPosition
+            updateRightConstraint(with: .zero)
             layoutIfNeeded()
         }
     }
