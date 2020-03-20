@@ -319,6 +319,7 @@ public protocol TrimmerViewDelegate: class {
         }
         set {
             leftConstraint?.constant = getPosition(from: newValue ?? CMTime.zero) ?? 0.0
+            layoutIfNeeded()
         }
     }
 
@@ -330,6 +331,7 @@ public protocol TrimmerViewDelegate: class {
         }
         set {
             rightConstraint?.constant = getPosition(from: newValue ?? asset?.duration ?? .zero) ?? 0.0
+            layoutIfNeeded()
         }
     }
 
