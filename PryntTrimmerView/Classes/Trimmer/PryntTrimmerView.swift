@@ -318,7 +318,9 @@ public protocol TrimmerViewDelegate: class {
             return getTime(from: startPosition)
         }
         set {
-            leftConstraint?.constant = getPosition(from: newValue ?? CMTime.zero) ?? 0.0
+            let leftPosition = getPosition(from: newValue ?? CMTime.zero) ?? 0.0
+            currentLeftConstraint = leftPosition
+            leftConstraint?.constant = leftPosition
             layoutIfNeeded()
         }
     }
@@ -330,7 +332,9 @@ public protocol TrimmerViewDelegate: class {
             return getTime(from: endPosition)
         }
         set {
-            rightConstraint?.constant = getPosition(from: newValue ?? asset?.duration ?? .zero) ?? 0.0
+            let rightPosition = getPosition(from: newValue ?? asset?.duration ?? .zero) ?? 0.0
+            currentRightConstraint = rightPosition
+            rightConstraint?.constant = rightPosition
             layoutIfNeeded()
         }
     }
