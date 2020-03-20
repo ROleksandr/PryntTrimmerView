@@ -313,14 +313,24 @@ public protocol TrimmerViewDelegate: class {
 
     /// The selected start time for the current asset.
     public var startTime: CMTime? {
-        let startPosition = leftHandleView.frame.origin.x + assetPreview.contentOffset.x
-        return getTime(from: startPosition)
+        get {
+            let startPosition = leftHandleView.frame.origin.x + assetPreview.contentOffset.x
+            return getTime(from: startPosition)
+        }
+        set {
+            leftConstraint?.constant = getPosition(from: newValue ?? CMTime.zero) ?? 0.0
+        }
     }
 
     /// The selected end time for the current asset.
     public var endTime: CMTime? {
-        let endPosition = rightHandleView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
-        return getTime(from: endPosition)
+        get {
+            let endPosition = rightHandleView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
+            return getTime(from: endPosition)
+        }
+        set {
+            rightConstraint?.constant = getPosition(from: newValue ?? asset?.duration ?? .zero) ?? 0.0
+        }
     }
 
     private func updateSelectedTime(stoppedMoving: Bool) {
