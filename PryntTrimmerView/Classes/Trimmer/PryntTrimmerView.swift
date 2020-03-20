@@ -321,6 +321,7 @@ public protocol TrimmerViewDelegate: class {
             let leftPosition = getPosition(from: newValue ?? CMTime.zero) ?? 0.0
             currentLeftConstraint = leftPosition
             updateLeftConstraint(with: .zero)
+            layoutIfNeeded()
         }
     }
 
