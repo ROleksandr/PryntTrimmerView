@@ -321,7 +321,6 @@ public protocol TrimmerViewDelegate: class {
             let leftPosition = getPosition(from: newValue ?? CMTime.zero) ?? 0.0
             currentLeftConstraint = leftPosition
             updateLeftConstraint(with: .zero)
-            layoutIfNeeded()
         }
     }
 
@@ -333,8 +332,8 @@ public protocol TrimmerViewDelegate: class {
         }
         set {
             let rightPosition = getPosition(from: newValue ?? asset?.duration ?? .zero) ?? 0.0
-            currentRightConstraint = rightPosition
-            updateRightConstraint(with: .zero)
+            currentRightConstraint = 0.0
+            updateRightConstraint(with: CGPoint(x: -rightPosition, y: 0.0))
             layoutIfNeeded()
         }
     }
