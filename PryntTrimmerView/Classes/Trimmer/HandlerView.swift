@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class HandlerView: UIView {
-    private var inset: CGFloat = UIScreen.main.bounds.size.height == 568 ? -40 : -20
+    private var inset: CGFloat = UIScreen.main.bounds.size.height == 568 ? -60 : -20
 
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let hitFrame = bounds.insetBy(dx: inset, dy: inset)
