@@ -120,4 +120,10 @@ extension VideoTrimmerViewController: TrimmerViewDelegate {
         let duration = (trimmerView.endTime! - trimmerView.startTime!).seconds
         print(duration)
     }
+    
+    func didSeek(to time: CMTime) {
+        stopPlaybackTimeChecker()
+        player?.pause()
+        player?.seek(to: time, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+    }
 }

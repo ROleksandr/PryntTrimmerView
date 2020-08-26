@@ -12,6 +12,7 @@ import UIKit
 public protocol TrimmerViewDelegate: class {
     func didChangePositionBar(_ playerTime: CMTime)
     func positionBarStoppedMoving(_ playerTime: CMTime)
+    func didSeek(to time: CMTime)
 }
 
 /// A view to select a specific time range of a video. It consists of an asset preview with thumbnails inside a scroll view, two
@@ -73,7 +74,7 @@ public protocol TrimmerViewDelegate: class {
     private let trimView = UIView()
     private let leftHandleView = HandlerView()
     private let rightHandleView = HandlerView()
-    private let positionBar = UIView()
+    private let positionBar = PositionBarView()
     private let leftHandleKnob = UIView()
     private let rightHandleKnob = UIView()
     private let leftMaskView = UIView()
@@ -83,11 +84,13 @@ public protocol TrimmerViewDelegate: class {
 
     private var currentLeftConstraint: CGFloat = 0
     private var currentRightConstraint: CGFloat = 0
+    private var currentBarPosition: CGFloat = 0
     private var leftConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
 
     private let handleWidth: CGFloat = 16
+    private let positionWidth: CGFloat = 3
 
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
     public var minDuration: Double = 3
@@ -101,8 +104,8 @@ public protocol TrimmerViewDelegate: class {
         layer.zPosition = 1
         setupTrimmerView()
         setupHandleView()
-        setupMaskView()
         setupPositionBar()
+        setupMaskView()
         setupGestures()
         updateMainColor()
         updateHandleColor()
@@ -201,15 +204,12 @@ public protocol TrimmerViewDelegate: class {
     }
 
     private func setupPositionBar() {
-
-        positionBar.frame = CGRect(x: 0, y: 0, width: 3, height: frame.height)
+        positionBar.frame = CGRect(x: 0, y: 0, width: positionWidth, height: frame.height)
         positionBar.backgroundColor = positionBarColor
         positionBar.center = CGPoint(x: leftHandleView.frame.maxX, y: center.y)
         positionBar.layer.cornerRadius = 1
         positionBar.translatesAutoresizingMaskIntoConstraints = false
-        positionBar.isUserInteractionEnabled = false
-        addSubview(positionBar)
-
+        insertSubview(positionBar, belowSubview: leftHandleView)
         positionBar.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         positionBar.widthAnchor.constraint(equalToConstant: 3).isActive = true
         positionBar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
@@ -223,6 +223,8 @@ public protocol TrimmerViewDelegate: class {
         leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
         let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
         rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
+        let positionPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePositionBarGesture))
+        positionBar.addGestureRecognizer(positionPanGestureRecognizer)
     }
 
     private func updateMainColor() {
@@ -237,6 +239,25 @@ public protocol TrimmerViewDelegate: class {
     }
 
     // MARK: - Trim Gestures
+    
+    @objc func handlePositionBarGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+        guard let superView = gestureRecognizer.view?.superview else { return }
+        switch gestureRecognizer.state {
+        case .began:
+            currentBarPosition = positionBar.frame.origin.x + assetPreview.contentOffset.x - handleWidth
+        case .changed:
+            let translation = gestureRecognizer.translation(in: superView)
+            if let time = getTime(from: currentBarPosition + translation.x) {
+                seek(to: time)
+                delegate?.didSeek(to: time)
+            }
+        default:
+            if let startTime = startTime {
+                seek(to: startTime)
+                updateSelectedTime(stoppedMoving: true)
+            }
+        }
+    }
 
     @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard let view = gestureRecognizer.view, let superView = gestureRecognizer.view?.superview else { return }
