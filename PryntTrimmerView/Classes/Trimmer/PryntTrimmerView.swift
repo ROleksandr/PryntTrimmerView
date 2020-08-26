@@ -374,4 +374,15 @@ public protocol TrimmerViewDelegate: class {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateSelectedTime(stoppedMoving: false)
     }
+    
+    private var inset: CGFloat = UIScreen.main.bounds.size.height == 568 ? -60 : -20
+    
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let hitFrame = bounds.insetBy(dx: inset, dy: 0)
+        return hitFrame.contains(point) ? super.hitTest(point, with: event) : nil
+    }
+    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let hitFrame = bounds.insetBy(dx: inset, dy: 0)
+        return hitFrame.contains(point)
+    }
 }
