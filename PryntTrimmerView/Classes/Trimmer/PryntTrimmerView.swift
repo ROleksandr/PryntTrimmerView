@@ -74,7 +74,7 @@ public protocol TrimmerViewDelegate: class {
     private let trimView = UIView()
     private let leftHandleView = HandlerView()
     private let rightHandleView = HandlerView()
-    private let positionBar = PositionBarView()
+    private let positionBar = UIView()
     private let leftHandleKnob = UIView()
     private let rightHandleKnob = UIView()
     private let leftMaskView = UIView()
@@ -84,7 +84,6 @@ public protocol TrimmerViewDelegate: class {
 
     private var currentLeftConstraint: CGFloat = 0
     private var currentRightConstraint: CGFloat = 0
-    private var currentBarPosition: CGFloat = 0
     private var leftConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
@@ -209,6 +208,7 @@ public protocol TrimmerViewDelegate: class {
         positionBar.center = CGPoint(x: leftHandleView.frame.maxX, y: center.y)
         positionBar.layer.cornerRadius = 1
         positionBar.translatesAutoresizingMaskIntoConstraints = false
+        positionBar.isUserInteractionEnabled = false
         insertSubview(positionBar, belowSubview: leftHandleView)
         positionBar.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         positionBar.widthAnchor.constraint(equalToConstant: 3).isActive = true
@@ -223,8 +223,12 @@ public protocol TrimmerViewDelegate: class {
         leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
         let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
         rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
-        let positionPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePositionBarGesture))
-        positionBar.addGestureRecognizer(positionPanGestureRecognizer)
+        let seekPanGesture = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handleSeekPanGesture))
+        assetPreview.addGestureRecognizer(seekPanGesture)
+        let seekTapGesture = UITapGestureRecognizer(target: self, action: #selector(TrimmerView.handleSeekTapGesture))
+        seekTapGesture.require(toFail: seekPanGesture)
+        assetPreview.addGestureRecognizer(seekTapGesture)
+        assetPreview.isScrollEnabled = false
     }
 
     private func updateMainColor() {
@@ -240,24 +244,27 @@ public protocol TrimmerViewDelegate: class {
 
     // MARK: - Trim Gestures
     
-    @objc func handlePositionBarGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
-        guard let superView = gestureRecognizer.view?.superview else { return }
+    @objc func handleSeekPanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         switch gestureRecognizer.state {
-        case .began:
-            currentBarPosition = positionBar.frame.origin.x + assetPreview.contentOffset.x - handleWidth
-        case .changed:
-            let translation = gestureRecognizer.translation(in: superView)
-            if let time = getTime(from: currentBarPosition + translation.x) {
+        case .changed, .began:
+            let location = gestureRecognizer.location(in: self)
+            if let time = getTime(from: location.x) {
                 seek(to: time)
                 delegate?.didSeek(to: time)
             }
         default:
-            if let startTime = startTime {
-                seek(to: startTime)
-                updateSelectedTime(stoppedMoving: true)
-            }
+            ()
         }
     }
+    
+    @objc func handleSeekTapGesture(_ gestureRecognizer: UITapGestureRecognizer) {
+        let location = gestureRecognizer.location(in: self)
+        if let time = getTime(from: location.x) {
+            seek(to: time)
+            delegate?.didSeek(to: time)
+        }
+    }
+    
 
     @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard let view = gestureRecognizer.view, let superView = gestureRecognizer.view?.superview else { return }
