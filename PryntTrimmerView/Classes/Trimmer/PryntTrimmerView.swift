@@ -248,7 +248,10 @@ public protocol TrimmerViewDelegate: class {
         switch gestureRecognizer.state {
         case .changed, .began:
             let location = gestureRecognizer.location(in: self)
-            if let time = getTime(from: location.x) {
+            if var time = getTime(from: location.x),
+                let endTime = endTime,
+                let startTime = startTime {
+                time = time < startTime ? startTime : time > endTime ? endTime : time
                 seek(to: time)
                 delegate?.didSeek(to: time)
             }
@@ -259,7 +262,10 @@ public protocol TrimmerViewDelegate: class {
     
     @objc func handleSeekTapGesture(_ gestureRecognizer: UITapGestureRecognizer) {
         let location = gestureRecognizer.location(in: self)
-        if let time = getTime(from: location.x) {
+        if var time = getTime(from: location.x),
+            let endTime = endTime,
+            let startTime = startTime {
+            time = time < startTime ? startTime : time > endTime ? endTime : time
             seek(to: time)
             delegate?.didSeek(to: time)
         }
