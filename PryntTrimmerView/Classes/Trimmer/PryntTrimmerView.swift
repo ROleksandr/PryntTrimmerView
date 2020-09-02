@@ -13,6 +13,7 @@ public protocol TrimmerViewDelegate: class {
     func didChangePositionBar(_ playerTime: CMTime)
     func positionBarStoppedMoving(_ playerTime: CMTime)
     func didSeek(to time: CMTime)
+    func didStartMovingPositionBar()
 }
 
 /// A view to select a specific time range of a video. It consists of an asset preview with thumbnails inside a scroll view, two
@@ -283,6 +284,7 @@ public protocol TrimmerViewDelegate: class {
             } else {
                 currentRightConstraint = rightConstraint!.constant
             }
+            delegate?.didStartMovingPositionBar()
             updateSelectedTime(stoppedMoving: false)
         case .changed:
             let translation = gestureRecognizer.translation(in: superView)

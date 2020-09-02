@@ -126,4 +126,6 @@ extension VideoTrimmerViewController: TrimmerViewDelegate {
         player?.pause()
         player?.seek(to: time, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
     }
+    
+    func didStartMovingPositionBar() { }
 }
